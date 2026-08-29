@@ -44,11 +44,13 @@ Exit gate:
 - at least 70% approve a useful Brief within ten minutes;
 - product and technical acceptance tests pass.
 
-M1 is delivered in small vertical slices. The active slice, M1.1, ends after a
-Brain Dump can be created idempotently, stored in PostgreSQL without textual
-normalization, retrieved, and safely retried from the web UI. Clarification,
-proposal ports, Briefs, and actions remain later M1 slices. Completing M1.1 does
-not claim that the M1 product metrics have been met.
+M1 is delivered in small vertical slices. The first implementation slice,
+M1.1, ends after a Brain Dump can be created idempotently, stored in PostgreSQL
+without textual normalization, retrieved, and safely retried from the web UI.
+That implementation is verified. Clarification, proposal ports, Briefs, and
+actions remain later M1 slices, none of which has a slice-level engineering
+contract yet. Completing M1.1 does not claim that the M1 product metrics have
+been met.
 
 ## M1.5 — Live model adapter
 

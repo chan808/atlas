@@ -1,6 +1,6 @@
 # M1.1 Brain Dump Capture Contract
 
-Status: active engineering slice
+Status: implementation verified; merge pending owner teach-back
 Product milestone: M1 curiosity to approved Learning Brief
 
 ## User outcome
@@ -152,6 +152,12 @@ The slice is complete only when automated tests demonstrate:
 - Flyway applies to an empty PostgreSQL database and the full repository
   verification passes without a paid model call.
 
+The implementation evidence is executable in the repository: API tests cover
+domain validation, PostgreSQL retry/concurrency, HTTP behavior, privacy, and
+Modulith discovery; web tests cover form behavior, exact request values,
+retry-key reuse, and duplicate-submit prevention. Local browser QA also checks
+the responsive form and an API-down failure followed by a successful retry.
+
 ## Removal and rollback
 
 Before external users exist, the feature can be removed by reverting the web,
@@ -162,7 +168,7 @@ explicit data-retention decision.
 
 ## Owner teach-back
 
-Before merge, the owner should be able to explain:
+Before merge, the owner must answer and explain:
 
 1. why exact preservation is defined after JSON decoding;
 2. why the unique constraint, rather than an application pre-check, arbitrates

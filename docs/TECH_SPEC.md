@@ -2,7 +2,8 @@
 
 Status: architecture baseline v0.1
 Completed implementation milestone: M0 repository setup
-Active engineering slice: M1.1 Brain Dump capture
+Implemented engineering slice: M1.1 Brain Dump capture
+Next engineering slice: not contracted
 
 ## 1. Design objective
 
@@ -304,9 +305,11 @@ in the application and are not treated as authorization.
 - The web development server proxies `/api`; the backend does not enable a
   wildcard CORS policy for convenience.
 
-The concrete M1 API contract is in `docs/FIRST_VERTICAL_SLICE.md` and may change
-before implementation. An OpenAPI document is generated only when the first API
-is implemented; it is not written speculatively.
+The implemented capture API contract is in `docs/M1_CAPTURE_SLICE.md`. The wider
+M1 product contract remains in `docs/FIRST_VERTICAL_SLICE.md` and may change
+before each later slice is implemented. An OpenAPI generator is added only when
+another client or contract publication creates a concrete need; the current
+local web/API boundary is covered by executable HTTP tests.
 
 ## 12. Security and privacy baseline
 
@@ -340,9 +343,12 @@ never mount a Docker socket or run user-provided commands.
 
 ### Web
 
-- Component tests for empty input, one-question display, alternative answers,
-  Brief editing, approval, and preserving input on API failure
-- A small number of end-to-end tests after the first real user path exists
+- M1.1 component tests for blank and oversized input, exact request values,
+  retry-key reuse, duplicate-submit prevention, and preserving input on failure
+- Later M1 component tests for one-question display, alternative answers, Brief
+  editing, and approval when those behaviors are implemented
+- A small number of automated end-to-end tests when the first multi-step M1
+  path makes the browser/API boundary regression-prone
 - Accessibility assertions on the primary flow
 
 ### AI evaluation

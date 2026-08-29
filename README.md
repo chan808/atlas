@@ -14,9 +14,11 @@ verification; it is not part of the initial code slice yet.
 
 ## Current status
 
-This repository contains the product and architecture baseline plus a verified
-Spring Boot and React workspace. The first product slice is documented but not
-implemented yet.
+This repository contains the product and architecture baseline plus the first
+implemented vertical slice: M1.1 Brain Dump capture. A local user can preserve
+an unfinished thought through the React form, retrieve it through the Spring
+Boot API, and safely retry creation without duplicate PostgreSQL state. No
+clarification or AI behavior has been implemented yet.
 
 ```text
 apps/api   Java 21 + Spring Boot modular monolith
@@ -64,7 +66,9 @@ that terminal environment.
 Run the API:
 
 ```powershell
-.\apps\api\mvnw.cmd --file .\apps\api\pom.xml spring-boot:run
+Push-Location .\apps\api
+.\mvnw.cmd spring-boot:run
+Pop-Location
 ```
 
 Run the web app in another terminal:

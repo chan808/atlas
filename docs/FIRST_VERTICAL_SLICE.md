@@ -2,8 +2,8 @@
 
 Status: product contract for M1; implemented as independently reviewable slices
 
-The active engineering slice is **M1.1 Brain Dump capture**. Its exact API,
-validation, idempotency, failure, and acceptance contract is
+The first implemented engineering slice is **M1.1 Brain Dump capture**. Its
+exact API, validation, idempotency, failure, and acceptance contract is
 [`M1_CAPTURE_SLICE.md`](M1_CAPTURE_SLICE.md). M1.1 does not create a
 clarification turn, proposal port, fake generator, Brief, or Exploration Action.
 
@@ -143,9 +143,11 @@ Starter prompts may include:
 - Name an observable completion result and stop condition.
 - Avoid requiring a technology the Brief explicitly excludes.
 
-## Draft API contract
+## API contracts: implemented capture and later drafts
 
-The contract is intentionally small and may be refined during implementation.
+The M1.1 create and retrieve endpoints are implemented and governed by
+`docs/M1_CAPTURE_SLICE.md`. Only the later M1 endpoints in this section remain
+drafts that may be refined before their slice-level implementation.
 
 ### Create Inquiry
 
@@ -160,6 +162,15 @@ Content-Type: application/json
 In M1.1, returns only the stored `CAPTURED` Inquiry. A later M1 slice adds the
 first clarification proposal without coupling capture success to proposal
 success.
+
+### Retrieve captured Inquiry
+
+```http
+GET /api/inquiries/{inquiryId}
+```
+
+In M1.1, returns only the same stored `CAPTURED` representation. Answered turns,
+a Brief, and a next action do not exist yet.
 
 ### Answer clarification
 
@@ -208,14 +219,15 @@ Content-Type: application/json
 
 Returns the approved revision and first Exploration Action.
 
-### Resume
+### Resume (later M1 draft)
 
 ```http
 GET /api/inquiries/{inquiryId}
 ```
 
-Returns the raw input, answered turns, current draft or approved Brief, and the
-next user-visible action. The response does not expose internal prompts.
+A later slice expands the M1.1 retrieve response with answered turns, the
+current draft or approved Brief, and the next user-visible action. The response
+does not expose internal prompts.
 
 ## Failure behavior
 
