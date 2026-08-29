@@ -16,6 +16,11 @@ interface CaptureAttempt {
   idempotencyKey: string
 }
 
+interface FormError {
+  message: string
+  invalidInput: boolean
+}
+
 interface AppProps {
   capture?: typeof captureInquiry
   createIdempotencyKey?: () => string
@@ -25,8 +30,35 @@ function codePointCount(value: string) {
   return Array.from(value).length
 }
 
+// Mirrors the API's Character.isWhitespace || Character.isSpaceChar boundary.
+function isAtlasWhitespace(codePoint: number) {
+  return (
+    (codePoint >= 0x0009 && codePoint <= 0x000d) ||
+    (codePoint >= 0x001c && codePoint <= 0x0020) ||
+    codePoint === 0x00a0 ||
+    codePoint === 0x1680 ||
+    (codePoint >= 0x2000 && codePoint <= 0x200a) ||
+    codePoint === 0x2028 ||
+    codePoint === 0x2029 ||
+    codePoint === 0x202f ||
+    codePoint === 0x205f ||
+    codePoint === 0x3000
+  )
+}
+
+function hasNonWhitespace(value: string) {
+  for (const character of value) {
+    const codePoint = character.codePointAt(0)
+    if (codePoint !== undefined && !isAtlasWhitespace(codePoint)) {
+      return true
+    }
+  }
+
+  return false
+}
+
 function validationMessage(rawText: string) {
-  if (rawText.trim().length === 0) {
+  if (!hasNonWhitespace(rawText)) {
     return '정리되지 않아도 괜찮아요. 떠오르는 단어나 문장을 하나만 적어주세요.'
   }
 
@@ -45,7 +77,7 @@ function App({
   const [attempt, setAttempt] = useState<CaptureAttempt | null>(null)
   const [capturedInquiry, setCapturedInquiry] =
     useState<CapturedInquiry | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<FormError | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const submittingRef = useRef(false)
 
@@ -57,7 +89,7 @@ function App({
 
     const invalidReason = validationMessage(rawText)
     if (invalidReason) {
-      setError(invalidReason)
+      setError({ message: invalidReason, invalidInput: true })
       return
     }
 
@@ -78,9 +110,11 @@ function App({
       )
       setCapturedInquiry(inquiry)
     } catch {
-      setError(
-        '지금은 생각을 저장하지 못했어요. 입력은 그대로 두었으니 다시 시도해 주세요.',
-      )
+      setError({
+        message:
+          '지금은 생각을 저장하지 못했어요. 입력은 그대로 두었으니 다시 시도해 주세요.',
+        invalidInput: false,
+      })
     } finally {
       submittingRef.current = false
       setIsSubmitting(false)
@@ -165,8 +199,12 @@ function App({
                 id="brain-dump"
                 value={rawText}
                 disabled={isSubmitting}
-                aria-describedby="brain-dump-help brain-dump-count"
-                aria-invalid={Boolean(error)}
+                aria-describedby={
+                  error
+                    ? 'brain-dump-help brain-dump-count brain-dump-error'
+                    : 'brain-dump-help brain-dump-count'
+                }
+                aria-invalid={error?.invalidInput ?? false}
                 onChange={(event) => updateRawText(event.target.value)}
                 placeholder="예: Kafka는 궁금한데, retry나 중복 같은 말을 들어도 내가 뭘 모르는지 모르겠어요."
                 rows={9}
@@ -186,8 +224,8 @@ function App({
               </div>
 
               {error && (
-                <p role="alert" className="form-error">
-                  {error}
+                <p id="brain-dump-error" role="alert" className="form-error">
+                  {error.message}
                 </p>
               )}
 

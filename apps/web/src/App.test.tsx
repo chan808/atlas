@@ -40,8 +40,26 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: '이 생각부터 보관하기' }))
 
     expect(capture).not.toHaveBeenCalled()
-    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveAttribute('id', 'brain-dump-error')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(input).toHaveAttribute(
+      'aria-describedby',
+      expect.stringContaining('brain-dump-error'),
+    )
     expect(input).toHaveValue(' \t\n ')
+  })
+
+  it('uses the same Unicode whitespace boundary as the API', async () => {
+    const user = userEvent.setup()
+    const capture = vi.fn()
+    render(<App capture={capture} />)
+    const input = screen.getByRole('textbox', { name: '정리되지 않은 생각' })
+    fireEvent.change(input, { target: { value: '\u001c\u00a0\u3000' } })
+
+    await user.click(screen.getByRole('button', { name: '이 생각부터 보관하기' }))
+
+    expect(capture).not.toHaveBeenCalled()
+    expect(input).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('adds starter prompts to the draft without submitting or overwriting it', async () => {
@@ -112,6 +130,7 @@ describe('App', () => {
     await user.click(submit)
     expect(await screen.findByRole('alert')).toBeInTheDocument()
     expect(input).toHaveValue(rawText)
+    expect(input).toHaveAttribute('aria-invalid', 'false')
     expect(capture).toHaveBeenNthCalledWith(1, rawText, 'retry-key-one')
 
     await user.click(submit)

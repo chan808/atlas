@@ -199,7 +199,7 @@
 }
 
 .capture-card textarea::placeholder {
-  color: #8b938d;
+  color: var(--muted);
 }
 
 .capture-card textarea:focus {
