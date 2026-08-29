@@ -48,13 +48,15 @@ Read `PRD.md`, `docs/TECH_SPEC.md`, `docs/FIRST_VERTICAL_SLICE.md`, and
 ## AI-assisted change rules
 
 - One observable behavior per change.
-- One unfamiliar technical concept per milestone.
+- One new architectural risk axis per milestone.
 - Before implementation, state the user behavior, invariants, failure cases,
   files affected, and verification plan.
 - Core changes to transactions, concurrency, authentication, AI execution,
-  migrations, isolation, or deployment require a user teach-back before merge.
-- If two unexplained core changes accumulate, stop feature work and simplify or
-  learn the missing concepts.
+  migrations, isolation, or deployment require a written change brief,
+  independent review, verification, and rollback notes. Owner teach-back is
+  never a commit or merge gate.
+- If two undocumented core changes accumulate, stop feature work and record the
+  missing evidence before continuing.
 - Use a separate review pass from the implementation pass.
 - Do not weaken tests merely to make an AI-generated implementation pass.
 

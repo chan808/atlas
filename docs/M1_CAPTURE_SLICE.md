@@ -1,6 +1,6 @@
 # M1.1 Brain Dump Capture Contract
 
-Status: implementation verified; merge pending owner teach-back
+Status: complete
 Product milestone: M1 curiosity to approved Learning Brief
 
 ## User outcome
@@ -165,15 +165,3 @@ API, and V1 migration together and recreating the local development database.
 Once a deployed database contains user data, never edit V1; disable the create
 route and add a forward migration or restore from backup according to an
 explicit data-retention decision.
-
-## Owner teach-back
-
-Before merge, the owner must answer and explain:
-
-1. why exact preservation is defined after JSON decoding;
-2. why the unique constraint, rather than an application pre-check, arbitrates
-   concurrent retries;
-3. where the transaction starts and what remains after process death;
-4. why the browser keeps a key only while retrying unchanged text;
-5. which tests prove preservation, conflict, and concurrency behavior;
-6. why no clarification or AI abstraction belongs in this slice.

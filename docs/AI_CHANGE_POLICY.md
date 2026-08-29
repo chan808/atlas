@@ -1,13 +1,14 @@
 # AI-Assisted Change Policy
 
 The project uses AI heavily for research, implementation, testing, and review.
-AI throughput is not the project's throughput. The limiting factor is how much
-critical change the owner can understand, verify, operate, and recover.
+Fast implementation is useful only when the resulting behavior remains
+verifiable, reviewable, operable, and recoverable. The owner's current learning
+progress does not gate development, commits, merges, or milestone completion.
 
-## 1. Ownership standard
+## 1. Change evidence standard
 
-The owner does not need to memorize boilerplate or every CSS rule. The owner must
-be able to explain and modify critical boundaries:
+Critical boundaries must be inspectable in code, tests, documentation, and
+runbooks as appropriate:
 
 - product state transitions and invariants;
 - transaction and data ownership boundaries;
@@ -18,12 +19,15 @@ be able to explain and modify critical boundaries:
 - process/container isolation;
 - deployment, rollback, and observability.
 
-An unexplained critical change is treated like a failing test.
+Missing evidence for a critical change is treated like a failing test. The AI
+must leave a concise handoff so the owner can learn the boundary now or later;
+no owner explanation or confirmation is required before merge.
 
-## 2. Novelty budget
+## 2. Complexity budget
 
-One milestone may introduce one unfamiliar core concept. Familiar tools support
-that concept; they do not multiply it.
+One milestone may introduce one new architectural risk axis into the product
+runtime. Familiar tools support that axis; they do not multiply it. This limits
+production complexity, not what the owner may learn or when they learn it.
 
 Examples:
 
@@ -52,8 +56,8 @@ Before code, write or state:
 ### Plan review
 
 AI proposes the smallest vertical change. The plan is rejected when it adds
-future abstractions, infrastructure without a trigger, or a second unfamiliar
-concept.
+future abstractions, infrastructure without a trigger, or a second architectural
+risk axis.
 
 ### Small implementation
 
@@ -61,8 +65,7 @@ concept.
 - Keep one implementation change in progress at a time.
 - Parallel AI work is for research, test design, and independent review, not
   overlapping code edits.
-- Core diffs must remain small enough for an owner teach-back in the same work
-  session.
+- Core diffs must remain small enough for independent review and safe rollback.
 
 ### Independent review
 
@@ -84,9 +87,9 @@ Run the full relevant suite. Do not change an assertion merely because generated
 code fails it. A test change must explain why the previous behavior or invariant
 was wrong.
 
-### Teach-back
+### Change handoff
 
-Before merge, the owner answers:
+Before merge, the change record answers:
 
 1. What user behavior changed?
 2. Where is the state stored and where does the transaction end?
@@ -95,8 +98,9 @@ Before merge, the owner answers:
 5. Which test proves each critical invariant?
 6. How is the change rolled back or removed?
 
-If an answer is unclear, simplify the code before asking for a longer AI
-explanation.
+The implementation and review agents may write this record. The owner may use
+it as a learning guide in any later session; it is not a comprehension test or
+approval gate.
 
 ## 4. Risk tiers
 
@@ -117,8 +121,8 @@ Required: user-flow explanation, tests, and failure behavior.
 Examples: transaction, concurrency, migration, authorization, AI execution,
 secrets, Runner, CI/CD, deployment.
 
-Required: explicit change brief, independent review, teach-back, rollback, and
-usually an ADR when the decision is costly to reverse.
+Required: explicit change brief, independent review, automated verification,
+rollback notes, and usually an ADR when the decision is costly to reverse.
 
 ## 5. ADR triggers
 
@@ -151,11 +155,11 @@ Do not create an ADR for every pull request or implementation detail.
 
 ## 7. Stop conditions
 
-Stop feature work and pay down understanding debt when:
+Stop feature work and pay down evidence or architecture debt when:
 
-- two unexplained critical changes have accumulated;
-- the owner cannot redraw the current request and data flow;
-- tests are edited without understanding what they prove;
+- two undocumented critical changes have accumulated;
+- the current request, data, and transaction flow is absent from code or docs;
+- tests are edited without recording which invariant changed;
 - a feature touches modules indiscriminately;
 - generated abstractions or duplicate code keep increasing;
 - docs and architecture tests disagree;
@@ -166,7 +170,7 @@ Stop feature work and pay down understanding debt when:
 
 - one executable user outcome;
 - passing verification;
-- one concept the owner can explain from memory;
+- a concise change handoff for critical boundaries;
 - an ADR only when a decision warrants it;
 - real usage observations and measurements;
 - a rollback, deletion, or simplification decision.

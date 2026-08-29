@@ -1,25 +1,28 @@
 # Owner Learning Protocol
 
-Atlas is both a product and the owner's long-term engineering curriculum. The
-goal is not to read everything before building or to let AI build everything
-before understanding it. Learning follows the next product decision.
+Atlas is both a product and the owner's long-term engineering curriculum.
+Development does not wait for the owner to understand every generated detail.
+AI leaves reviewable evidence and a learning path; the owner studies critical
+concepts when useful without blocking commits, merges, or milestones.
 
-## Weekly loop
+## Optional weekly learning loop
 
 1. Choose one user outcome and one unfamiliar concept.
-2. Read the minimum official material needed to state the concept, trade-off,
-   common failure, and observable signal.
+2. Record the minimum official material for the concept, trade-off, common
+   failure, and observable signal; the owner may read it during or after the
+   change.
 3. Build a disposable spike when the concept is uncertain.
 4. Write the change brief and implementation plan.
 5. Let AI implement in small reviewable steps.
 6. Run normal tests and one relevant failure drill.
 7. Reproduce the feature from the user's point of view.
-8. Explain the system without looking at the diagram.
+8. Optionally explain the system without looking at the diagram as a learning
+   exercise, never as a merge gate.
 9. Keep, simplify, or revert the decision based on evidence.
 
 ## Concept card
 
-Before introducing a new technical concept, answer in one page or less:
+When introducing a new technical concept, AI records in one page or less:
 
 - What concrete problem exists now?
 - What guarantee does this concept add?
@@ -40,7 +43,8 @@ learning notes rather than the product runtime.
 - **Operate:** observe, diagnose, recover, and roll it back.
 
 Critical production concepts are not considered learned until the owner reaches
-`Operate`. Atlas product milestones should create the evidence for that level.
+`Operate`, but this learning status is separate from product delivery. Atlas
+milestones should leave evidence the owner can revisit to reach that level.
 
 ## Failure drills by area
 
@@ -56,7 +60,7 @@ Only run drills relevant to implemented features.
 
 ## Learning log entry
 
-At the end of a milestone, record:
+At the end of a milestone, optionally record:
 
 - what the owner can now explain or operate;
 - what assumption changed;

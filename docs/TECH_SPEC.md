@@ -11,9 +11,9 @@ The system must preserve a learner's unstructured intent, use AI only as a
 non-authoritative proposal engine, and make every approved learning state
 traceable to a user action and version.
 
-The architecture must stay simple enough that its owner can explain, operate,
-and recover it. Future distributed components are introduced only after their
-product or operational need is measured.
+The architecture must stay simple enough to inspect, operate, and recover.
+Future distributed components are introduced only after their product or
+operational need is measured.
 
 ## 2. Core flow
 
@@ -382,7 +382,7 @@ into the product runtime.
 
 ## 15. Operational completion rule
 
-A milestone is complete only when the owner can explain:
+A milestone is complete only when repository evidence records:
 
 - the user behavior that changed;
 - the request and data flow;
@@ -391,4 +391,5 @@ A milestone is complete only when the owner can explain:
 - the test proving each invariant;
 - the rollback or removal path.
 
-If that explanation is missing, a green build does not make the change complete.
+Tests, documentation, review, and rollback evidence determine completion. The
+owner's current understanding or availability never blocks commit or merge.

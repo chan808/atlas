@@ -1,8 +1,9 @@
 # Project Atlas Roadmap
 
 This roadmap is ordered by product risk, not by architectural ambition. Each
-milestone introduces at most one unfamiliar technical axis and ends in an
-observable user outcome.
+milestone introduces at most one new architectural risk axis and ends in an
+observable user outcome. This complexity budget does not depend on the owner's
+current familiarity.
 
 ## M0 — Repository and product contract
 
@@ -21,7 +22,7 @@ Exit gate:
 
 - all verification commands pass from a clean checkout;
 - no paid model key is required;
-- the owner can explain why M1 is smaller than the product MVP.
+- M1 scope and exclusions are recorded in the product contract.
 
 ## M1 — Curiosity to approved Learning Brief
 
@@ -130,7 +131,7 @@ Exit gate:
 
 - threat model reviewed;
 - forced process death leaves no unmanaged lab;
-- the owner can explain every Runner privilege.
+- every Runner privilege is enumerated, justified, and covered by a control.
 
 ## M5 — Closed alpha
 
@@ -163,7 +164,8 @@ These are hypotheses, not scheduled work.
 
 ## Stop rules
 
-- Stop adding features if two core changes cannot be explained by the owner.
+- Stop adding features if two core changes lack a written flow, verification
+  evidence, or rollback notes.
 - Stop infrastructure work if a milestone produces no user-visible outcome.
 - Revert an infrastructure choice when its measured benefit does not exceed its
   operating cost.
