@@ -1,0 +1,13 @@
+{
+  "name": "project-atlas",
+  "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=22.17 <25",
+    "pnpm": ">=10 <12"
+  },
+  "scripts": {
+    "dev:web": "pnpm --dir apps/web dev",
+    "verify:web": "pnpm --dir apps/web verify"
+  }
+}

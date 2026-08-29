@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: atlas-api
+  datasource:
+    url: ${ATLAS_DB_URL:jdbc:postgresql://localhost:55432/atlas}
+    username: ${ATLAS_DB_USER:atlas}
+    password: ${ATLAS_DB_PASSWORD:atlas-local}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

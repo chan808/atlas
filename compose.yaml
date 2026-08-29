@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${ATLAS_DB_NAME:-atlas}
+      POSTGRES_USER: ${ATLAS_DB_USER:-atlas}
+      POSTGRES_PASSWORD: ${ATLAS_DB_PASSWORD:-atlas-local}
+    ports:
+      - "127.0.0.1:${ATLAS_DB_PORT:-55432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ATLAS_DB_USER:-atlas} -d ${ATLAS_DB_NAME:-atlas}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - atlas-postgres-data:/var/lib/postgresql
+
+volumes:
+  atlas-postgres-data:

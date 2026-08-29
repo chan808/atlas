@@ -1,0 +1,49 @@
+:root {
+  color: #243026;
+  background: #f3f3ec;
+  font-family:
+    Inter, Pretendard, 'Noto Sans KR', 'Segoe UI', system-ui, -apple-system,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --ink: #18221a;
+  --ink-soft: #2f3d32;
+  --muted: #69736b;
+  --accent: #3b6948;
+  --surface-strong: #e8ebe2;
+  --line: rgba(31, 48, 35, 0.13);
+  --line-strong: rgba(31, 48, 35, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background:
+    linear-gradient(rgba(31, 48, 35, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 48, 35, 0.025) 1px, transparent 1px),
+    #f3f3ec;
+  background-size: 48px 48px;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+::selection {
+  color: #f8faf6;
+  background: #3b6948;
+}
