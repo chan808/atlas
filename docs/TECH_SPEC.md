@@ -3,7 +3,7 @@
 Status: architecture baseline v0.1
 Completed implementation milestone: M0 repository setup
 Implemented engineering slice: M1.1 Brain Dump capture
-Next engineering slice: not contracted
+Next engineering slice: M1.2 First Clarification Question contracted, not implemented
 
 ## 1. Design objective
 
@@ -43,10 +43,11 @@ Browser
   -> PostgreSQL
 ```
 
-The first code slice contains only the `inquiry` product module needed to
-capture and retrieve a Brain Dump. Clarification proposal ports and their
-deterministic fake arrive in a later M1 slice. There is no Worker, Runner,
-message broker, cache, vector store, or activity framework.
+The current code contains only the `inquiry` product module needed to capture
+and retrieve a Brain Dump. M1.2 contracts the first clarification proposal
+port, deterministic fake, persisted turn, and `CAPTURED -> CLARIFYING`
+transition, but none is implemented yet. There is no Worker, Runner, message
+broker, cache, vector store, or activity framework.
 
 ### Target product concepts, not initial modules
 
@@ -135,6 +136,10 @@ M1.1 implements only an `Inquiry` with an immutable raw value, `CAPTURED`
 status, creation time, and creation idempotency key. The remaining types in this
 section are M1 design constraints, not permission to scaffold them early. The
 executable M1.1 contract is `docs/M1_CAPTURE_SLICE.md`.
+
+The next executable contract is
+`docs/M1_FIRST_CLARIFICATION_SLICE.md`. Until its implementation is complete,
+the code and deployed behavior remain M1.1 only.
 
 ### Inquiry
 
@@ -305,11 +310,13 @@ in the application and are not treated as authorization.
 - The web development server proxies `/api`; the backend does not enable a
   wildcard CORS policy for convenience.
 
-The implemented capture API contract is in `docs/M1_CAPTURE_SLICE.md`. The wider
-M1 product contract remains in `docs/FIRST_VERTICAL_SLICE.md` and may change
-before each later slice is implemented. An OpenAPI generator is added only when
-another client or contract publication creates a concrete need; the current
-local web/API boundary is covered by executable HTTP tests.
+The implemented capture API contract is in `docs/M1_CAPTURE_SLICE.md`; the
+contracted first-question API is in
+`docs/M1_FIRST_CLARIFICATION_SLICE.md`. The wider M1 product contract remains in
+`docs/FIRST_VERTICAL_SLICE.md` and may change before each later slice is
+implemented. An OpenAPI generator is added only when another client or contract
+publication creates a concrete need; the current local web/API boundary is
+covered by executable HTTP tests.
 
 ## 12. Security and privacy baseline
 

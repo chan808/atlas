@@ -7,6 +7,12 @@ exact API, validation, idempotency, failure, and acceptance contract is
 [`M1_CAPTURE_SLICE.md`](M1_CAPTURE_SLICE.md). M1.1 does not create a
 clarification turn, proposal port, fake generator, Brief, or Exploration Action.
 
+The next contracted but not implemented slice is **M1.2 First Clarification
+Question**. Its exact state, proposal, API, retry, and acceptance contract is
+[`M1_FIRST_CLARIFICATION_SLICE.md`](M1_FIRST_CLARIFICATION_SLICE.md). It ends
+when the user sees one persisted question and its reason; answering that
+question remains a later contract.
+
 ## Outcome
 
 A local single user can paste an unstructured technical thought and, within ten
@@ -143,11 +149,13 @@ Starter prompts may include:
 - Name an observable completion result and stop condition.
 - Avoid requiring a technology the Brief explicitly excludes.
 
-## API contracts: implemented capture and later drafts
+## API contracts: implemented capture, contracted first question, and later drafts
 
 The M1.1 create and retrieve endpoints are implemented and governed by
-`docs/M1_CAPTURE_SLICE.md`. Only the later M1 endpoints in this section remain
-drafts that may be refined before their slice-level implementation.
+`docs/M1_CAPTURE_SLICE.md`. The M1.2 start and turn-retrieval endpoints are
+contracted separately. The answer, Brief draft, approval, and later expanded
+resume endpoints remain drafts that may be refined before their slice-level
+implementation.
 
 ### Create Inquiry
 
@@ -159,9 +167,9 @@ Content-Type: application/json
 { "rawText": "..." }
 ```
 
-In M1.1, returns only the stored `CAPTURED` Inquiry. A later M1 slice adds the
-first clarification proposal without coupling capture success to proposal
-success.
+In M1.1, returns only the stored `CAPTURED` Inquiry. M1.2 keeps capture success
+independent and adds a separate, explicit start request for the first
+clarification proposal.
 
 ### Retrieve captured Inquiry
 
@@ -171,6 +179,15 @@ GET /api/inquiries/{inquiryId}
 
 In M1.1, returns only the same stored `CAPTURED` representation. Answered turns,
 a Brief, and a next action do not exist yet.
+
+### Start and retrieve the first clarification turn
+
+M1.2 adds an explicit, idempotent start request, stable turn retrieval, and a
+singleton current-turn recovery route after capture. The exact request,
+response, optimistic version, transaction, retry, and error behavior is
+governed by
+[`M1_FIRST_CLARIFICATION_SLICE.md`](M1_FIRST_CLARIFICATION_SLICE.md). These
+routes are contracted but not implemented.
 
 ### Answer clarification
 
