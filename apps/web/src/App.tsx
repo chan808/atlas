@@ -1,4 +1,8 @@
+import { useRef, useState, type FormEvent } from 'react'
 import './App.css'
+import { captureInquiry, type CapturedInquiry } from './inquiryApi'
+
+const MAX_CODE_POINTS = 10_000
 
 const startingPoints = [
   '자주 보이지만 설명하지 못하는 단어',
@@ -7,7 +11,91 @@ const startingPoints = [
   '안다고 생각했지만 막상 설명하기 어려운 개념',
 ]
 
-function App() {
+interface CaptureAttempt {
+  rawText: string
+  idempotencyKey: string
+}
+
+interface AppProps {
+  capture?: typeof captureInquiry
+  createIdempotencyKey?: () => string
+}
+
+function codePointCount(value: string) {
+  return Array.from(value).length
+}
+
+function validationMessage(rawText: string) {
+  if (rawText.trim().length === 0) {
+    return '정리되지 않아도 괜찮아요. 떠오르는 단어나 문장을 하나만 적어주세요.'
+  }
+
+  if (codePointCount(rawText) > MAX_CODE_POINTS) {
+    return '생각을 10,000자 안으로 나눠 적어주세요.'
+  }
+
+  return null
+}
+
+function App({
+  capture = captureInquiry,
+  createIdempotencyKey = () => crypto.randomUUID(),
+}: AppProps) {
+  const [rawText, setRawText] = useState('')
+  const [attempt, setAttempt] = useState<CaptureAttempt | null>(null)
+  const [capturedInquiry, setCapturedInquiry] =
+    useState<CapturedInquiry | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const submittingRef = useRef(false)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (submittingRef.current) {
+      return
+    }
+
+    const invalidReason = validationMessage(rawText)
+    if (invalidReason) {
+      setError(invalidReason)
+      return
+    }
+
+    const activeAttempt =
+      attempt?.rawText === rawText
+        ? attempt
+        : { rawText, idempotencyKey: createIdempotencyKey() }
+
+    setAttempt(activeAttempt)
+    setError(null)
+    submittingRef.current = true
+    setIsSubmitting(true)
+
+    try {
+      const inquiry = await capture(
+        activeAttempt.rawText,
+        activeAttempt.idempotencyKey,
+      )
+      setCapturedInquiry(inquiry)
+    } catch {
+      setError(
+        '지금은 생각을 저장하지 못했어요. 입력은 그대로 두었으니 다시 시도해 주세요.',
+      )
+    } finally {
+      submittingRef.current = false
+      setIsSubmitting(false)
+    }
+  }
+
+  const updateRawText = (value: string) => {
+    setRawText(value)
+    setError(null)
+  }
+
+  const addStartingPoint = (startingPoint: string) => {
+    updateRawText(rawText.length === 0 ? startingPoint : `${rawText}\n${startingPoint}`)
+  }
+
   return (
     <main className="page-shell">
       <header className="site-header">
@@ -17,51 +105,98 @@ function App() {
           </span>
           <span>Project Atlas</span>
         </a>
-        <span className="status-badge">Product foundation</span>
+        <span className="status-badge">M1.1 · Capture</span>
       </header>
 
       <section className="hero" aria-labelledby="hero-title">
-        <p className="eyebrow">CURIOSITY, BEFORE THE SEARCH</p>
-        <h1 id="hero-title">아직 질문이 아니어도 괜찮아요.</h1>
-        <p className="hero-copy">
-          생각나는 단어와 경험을 그대로 꺼내놓으세요. Atlas는 정답부터
-          말하지 않고, 당신이 정말 알고 싶은 것을 함께 질문으로 만듭니다.
-        </p>
-
-        <div className="thought-card" aria-label="정리되지 않은 생각의 예시">
-          <div className="thought-card-header">
-            <span className="signal-dot" aria-hidden="true" />
-            <span>정리되지 않은 생각도 충분한 시작입니다</span>
-          </div>
-          <blockquote>
-            “Kafka도 궁금하고 대규모 시스템도 배우고 싶은데, 뭘 모르는지
-            몰라서 어디서부터 찾아야 할지 막막해요.”
-          </blockquote>
-          <div className="flow-preview" aria-label="Atlas의 학습 흐름">
-            <span>생각</span>
-            <span aria-hidden="true">→</span>
-            <span>질문</span>
-            <span aria-hidden="true">→</span>
-            <span>작은 행동</span>
-            <span aria-hidden="true">→</span>
-            <span>증거</span>
-          </div>
+        <div className="hero-intro">
+          <p className="eyebrow">CURIOSITY, BEFORE THE SEARCH</p>
+          <h1 id="hero-title">아직 질문이 아니어도 괜찮아요.</h1>
+          <p className="hero-copy">
+            생각나는 단어와 경험을 그대로 꺼내놓으세요. 먼저 원문을 안전하게
+            보관하고, 해석은 당신의 확인을 거쳐 나중에 시작합니다.
+          </p>
         </div>
-      </section>
 
-      <section className="starting-section" aria-labelledby="starting-title">
-        <div>
-          <p className="section-kicker">어디서 시작할지 모르겠다면</p>
-          <h2 id="starting-title">이 중 하나만 떠올려도 충분합니다.</h2>
-        </div>
-        <ul className="starting-grid">
-          {startingPoints.map((startingPoint, index) => (
-            <li key={startingPoint}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <p>{startingPoint}</p>
-            </li>
-          ))}
-        </ul>
+        {capturedInquiry ? (
+          <section
+            className="capture-card capture-success"
+            aria-labelledby="capture-success-title"
+            role="status"
+          >
+            <div className="capture-card-heading">
+              <span className="signal-dot" aria-hidden="true" />
+              <p>CAPTURED</p>
+            </div>
+            <h2 id="capture-success-title">원문을 그대로 보관했습니다.</h2>
+            <pre aria-label="저장된 원문">{capturedInquiry.rawText}</pre>
+            <p className="success-note">
+              아직 해석하거나 질문으로 바꾸지 않았습니다. 다음 조각에서 당신의
+              확인을 받으며 방향을 좁힙니다.
+            </p>
+          </section>
+        ) : (
+          <section className="capture-card" aria-labelledby="capture-title">
+            <div className="capture-card-heading">
+              <span className="signal-dot" aria-hidden="true" />
+              <p>정리되지 않은 생각도 충분한 시작입니다</p>
+            </div>
+            <h2 id="capture-title">지금 궁금한 것을 있는 그대로 남겨보세요.</h2>
+
+            <div className="starter-prompts" aria-labelledby="starter-title">
+              <p id="starter-title">막막하다면 시작 문구를 골라도 좋아요.</p>
+              <div className="starter-grid">
+                {startingPoints.map((startingPoint) => (
+                  <button
+                    key={startingPoint}
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={() => addStartingPoint(startingPoint)}
+                  >
+                    {startingPoint}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} noValidate>
+              <label htmlFor="brain-dump">정리되지 않은 생각</label>
+              <textarea
+                id="brain-dump"
+                value={rawText}
+                disabled={isSubmitting}
+                aria-describedby="brain-dump-help brain-dump-count"
+                aria-invalid={Boolean(error)}
+                onChange={(event) => updateRawText(event.target.value)}
+                placeholder="예: Kafka는 궁금한데, retry나 중복 같은 말을 들어도 내가 뭘 모르는지 모르겠어요."
+                rows={9}
+              />
+              <div className="input-meta">
+                <p id="brain-dump-help">공백과 줄바꿈을 포함한 원문 그대로 저장합니다.</p>
+                <p
+                  id="brain-dump-count"
+                  className={
+                    codePointCount(rawText) > MAX_CODE_POINTS
+                      ? 'count count-over'
+                      : 'count'
+                  }
+                >
+                  {codePointCount(rawText).toLocaleString()} / 10,000
+                </p>
+              </div>
+
+              {error && (
+                <p role="alert" className="form-error">
+                  {error}
+                </p>
+              )}
+
+              <button className="submit-button" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? '원문을 보관하는 중…' : '이 생각부터 보관하기'}
+              </button>
+            </form>
+          </section>
+        )}
       </section>
 
       <footer className="principles" aria-label="Project Atlas 제품 원칙">
