@@ -1,6 +1,13 @@
 import { useRef, useState, type FormEvent } from 'react'
 import './App.css'
-import { captureInquiry, type CapturedInquiry } from './inquiryApi'
+import {
+  captureInquiry,
+  getCurrentClarificationTurn,
+  InquiryRequestError,
+  startClarification,
+  type CapturedInquiry,
+  type ClarificationTurn,
+} from './inquiryApi'
 
 const MAX_CODE_POINTS = 10_000
 
@@ -21,9 +28,23 @@ interface FormError {
   invalidInput: boolean
 }
 
+interface ClarificationAttempt {
+  inquiryId: string
+  inquiryVersion: number
+  idempotencyKey: string
+}
+
+interface ClarificationError {
+  message: string
+  terminal: boolean
+}
+
 interface AppProps {
   capture?: typeof captureInquiry
+  startClarificationRequest?: typeof startClarification
+  getCurrentTurn?: typeof getCurrentClarificationTurn
   createIdempotencyKey?: () => string
+  createClarificationIdempotencyKey?: () => string
 }
 
 function codePointCount(value: string) {
@@ -71,7 +92,10 @@ function validationMessage(rawText: string) {
 
 function App({
   capture = captureInquiry,
+  startClarificationRequest = startClarification,
+  getCurrentTurn = getCurrentClarificationTurn,
   createIdempotencyKey = () => crypto.randomUUID(),
+  createClarificationIdempotencyKey = () => crypto.randomUUID(),
 }: AppProps) {
   const [rawText, setRawText] = useState('')
   const [attempt, setAttempt] = useState<CaptureAttempt | null>(null)
@@ -79,7 +103,15 @@ function App({
     useState<CapturedInquiry | null>(null)
   const [error, setError] = useState<FormError | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [clarificationAttempt, setClarificationAttempt] =
+    useState<ClarificationAttempt | null>(null)
+  const [clarificationTurn, setClarificationTurn] =
+    useState<ClarificationTurn | null>(null)
+  const [clarificationError, setClarificationError] =
+    useState<ClarificationError | null>(null)
+  const [isStartingClarification, setIsStartingClarification] = useState(false)
   const submittingRef = useRef(false)
+  const startingClarificationRef = useRef(false)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -109,6 +141,9 @@ function App({
         activeAttempt.idempotencyKey,
       )
       setCapturedInquiry(inquiry)
+      setClarificationAttempt(null)
+      setClarificationTurn(null)
+      setClarificationError(null)
     } catch {
       setError({
         message:
@@ -130,6 +165,77 @@ function App({
     updateRawText(rawText.length === 0 ? startingPoint : `${rawText}\n${startingPoint}`)
   }
 
+  const handleStartClarification = async () => {
+    if (
+      capturedInquiry === null ||
+      startingClarificationRef.current ||
+      clarificationError?.terminal
+    ) {
+      return
+    }
+
+    const activeAttempt =
+      clarificationAttempt?.inquiryId === capturedInquiry.id &&
+      clarificationAttempt.inquiryVersion === capturedInquiry.version
+        ? clarificationAttempt
+        : {
+            inquiryId: capturedInquiry.id,
+            inquiryVersion: capturedInquiry.version,
+            idempotencyKey: createClarificationIdempotencyKey(),
+          }
+
+    setClarificationAttempt(activeAttempt)
+    setClarificationError(null)
+    startingClarificationRef.current = true
+    setIsStartingClarification(true)
+
+    try {
+      const turn = await startClarificationRequest(
+        activeAttempt.inquiryId,
+        activeAttempt.inquiryVersion,
+        activeAttempt.idempotencyKey,
+      )
+      setClarificationTurn(turn)
+    } catch (startError) {
+      const status =
+        startError instanceof InquiryRequestError ? startError.status : null
+
+      if (status === 409) {
+        try {
+          const currentTurn = await getCurrentTurn(activeAttempt.inquiryId)
+          setClarificationTurn(currentTurn)
+        } catch {
+          setClarificationError({
+            message:
+              '다른 요청이 먼저 처리됐지만 현재 질문을 확인하지 못했어요. 원문은 그대로 보관되어 있습니다.',
+            terminal: true,
+          })
+        }
+      } else if (status === null || status >= 500) {
+        setClarificationError({
+          message:
+            '질문 요청의 결과를 확인하지 못했어요. 원문은 그대로 있으며 같은 요청으로 다시 시도할 수 있습니다.',
+          terminal: false,
+        })
+      } else if (status === 404) {
+        setClarificationError({
+          message:
+            '저장된 생각을 찾지 못해 질문을 시작할 수 없어요. 이 요청은 다시 보내지 않습니다.',
+          terminal: true,
+        })
+      } else {
+        setClarificationError({
+          message:
+            '질문 시작 요청이 유효하지 않아 다시 보내지 않습니다. 원문은 그대로 보관되어 있습니다.',
+          terminal: true,
+        })
+      }
+    } finally {
+      startingClarificationRef.current = false
+      setIsStartingClarification(false)
+    }
+  }
+
   return (
     <main className="page-shell">
       <header className="site-header">
@@ -139,7 +245,7 @@ function App({
           </span>
           <span>Project Atlas</span>
         </a>
-        <span className="status-badge">M1.1 · Capture</span>
+        <span className="status-badge">M1.2 · Clarify</span>
       </header>
 
       <section className="hero" aria-labelledby="hero-title">
@@ -165,9 +271,65 @@ function App({
             <h2 id="capture-success-title">원문을 그대로 보관했습니다.</h2>
             <pre aria-label="저장된 원문">{capturedInquiry.rawText}</pre>
             <p className="success-note">
-              아직 해석하거나 질문으로 바꾸지 않았습니다. 다음 조각에서 당신의
-              확인을 받으며 방향을 좁힙니다.
+              이 원문은 질문 제안과 구분해 계속 보관합니다.
             </p>
+
+            {clarificationTurn ? (
+              <section
+                className="clarification-result"
+                aria-labelledby="clarification-question-title"
+              >
+                <p className="clarification-label">첫 명확화 질문</p>
+                <h3 id="clarification-question-title">
+                  {clarificationTurn.question}
+                </h3>
+                <div
+                  className="clarification-reason"
+                  aria-labelledby="clarification-reason-title"
+                >
+                  <h4 id="clarification-reason-title">왜 이 답이 중요한가요?</h4>
+                  <p>{clarificationTurn.reason}</p>
+                </div>
+                <p className="slice-boundary">
+                  이 조각에서는 질문을 보여주는 데까지만 진행합니다. 답변과 다음
+                  학습 단계는 아직 시작하지 않습니다.
+                </p>
+              </section>
+            ) : (
+              <section
+                className="clarification-start"
+                aria-labelledby="clarification-start-title"
+              >
+                <h3 id="clarification-start-title">
+                  방향을 좁힐 질문 하나를 확인할까요?
+                </h3>
+                <p>
+                  답에 따라 학습 방향이나 확인할 증거가 달라지는 질문 하나만
+                  제안합니다. 시작은 자동으로 진행되지 않습니다.
+                </p>
+
+                {clarificationError && (
+                  <p role="alert" className="form-error clarification-error">
+                    {clarificationError.message}
+                  </p>
+                )}
+
+                {!clarificationError?.terminal && (
+                  <button
+                    className="submit-button clarification-button"
+                    type="button"
+                    disabled={isStartingClarification}
+                    onClick={handleStartClarification}
+                  >
+                    {isStartingClarification
+                      ? '질문을 준비하는 중…'
+                      : clarificationError
+                        ? '같은 요청으로 다시 시도하기'
+                        : '명확화 질문 하나 받기'}
+                  </button>
+                )}
+              </section>
+            )}
           </section>
         ) : (
           <section className="capture-card" aria-labelledby="capture-title">

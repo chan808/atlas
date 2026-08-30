@@ -48,11 +48,11 @@ Exit gate:
 M1 is delivered in small vertical slices. The first implementation slice,
 M1.1, ends after a Brain Dump can be created idempotently, stored in PostgreSQL
 without textual normalization, retrieved, and safely retried from the web UI.
-That implementation is verified. M1.2 now has a slice-level contract for
-explicitly starting clarification and seeing one persisted first question with
-its reason; implementation has not started. Answers, later turns, Briefs, and
-actions remain later M1 slices without executable contracts. Completing M1.1
-does not claim that the M1 product metrics have been met.
+That implementation is verified. M1.2 is also implemented and verified: the
+user explicitly starts clarification and sees one persisted first question
+with its reason beside the preserved raw text. Answers, later turns, Briefs,
+and actions remain later M1 slices without executable contracts. Completing
+M1.1 and M1.2 does not claim that the M1 product metrics have been met.
 
 ## M1.5 — Live model adapter
 

@@ -68,6 +68,8 @@ class InquiryCaptureIntegrationTests {
 
 	@BeforeEach
 	void clearInquiries() {
+		jdbcTemplate.update("DELETE FROM clarification_turns");
+		jdbcTemplate.update("DELETE FROM clarification_start_requests");
 		jdbcTemplate.update("DELETE FROM inquiries");
 	}
 
@@ -91,6 +93,7 @@ class InquiryCaptureIntegrationTests {
 		String id = createdBody.required("id").stringValue();
 		assertEquals(rawText, createdBody.required("rawText").stringValue());
 		assertEquals("CAPTURED", createdBody.required("status").stringValue());
+		assertEquals(0, createdBody.required("version").longValue());
 		assertEquals("/api/inquiries/" + id, created.getResponse().getHeader("Location"));
 
 		MvcResult retrieved = mockMvc.perform(get("/api/inquiries/{id}", id))

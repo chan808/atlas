@@ -24,8 +24,11 @@ class InquiryJpaEntity {
 	private String rawText;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "status", nullable = false, updatable = false, length = 32)
+	@Column(name = "status", nullable = false, length = 32)
 	private InquiryStatus status;
+
+	@Column(name = "version", nullable = false)
+	private long version;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;
@@ -50,6 +53,10 @@ class InquiryJpaEntity {
 
 	Instant createdAt() {
 		return createdAt;
+	}
+
+	long version() {
+		return version;
 	}
 
 }

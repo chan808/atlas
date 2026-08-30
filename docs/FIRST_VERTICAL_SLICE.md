@@ -7,8 +7,8 @@ exact API, validation, idempotency, failure, and acceptance contract is
 [`M1_CAPTURE_SLICE.md`](M1_CAPTURE_SLICE.md). M1.1 does not create a
 clarification turn, proposal port, fake generator, Brief, or Exploration Action.
 
-The next contracted but not implemented slice is **M1.2 First Clarification
-Question**. Its exact state, proposal, API, retry, and acceptance contract is
+The second implemented slice is **M1.2 First Clarification Question**. Its exact
+state, proposal, API, retry, and acceptance contract is
 [`M1_FIRST_CLARIFICATION_SLICE.md`](M1_FIRST_CLARIFICATION_SLICE.md). It ends
 when the user sees one persisted question and its reason; answering that
 question remains a later contract.
@@ -149,11 +149,12 @@ Starter prompts may include:
 - Name an observable completion result and stop condition.
 - Avoid requiring a technology the Brief explicitly excludes.
 
-## API contracts: implemented capture, contracted first question, and later drafts
+## API contracts: implemented capture and first question, then later drafts
 
 The M1.1 create and retrieve endpoints are implemented and governed by
 `docs/M1_CAPTURE_SLICE.md`. The M1.2 start and turn-retrieval endpoints are
-contracted separately. The answer, Brief draft, approval, and later expanded
+implemented under their separate contract. The answer, Brief draft, approval,
+and later expanded
 resume endpoints remain drafts that may be refined before their slice-level
 implementation.
 
@@ -187,7 +188,7 @@ singleton current-turn recovery route after capture. The exact request,
 response, optimistic version, transaction, retry, and error behavior is
 governed by
 [`M1_FIRST_CLARIFICATION_SLICE.md`](M1_FIRST_CLARIFICATION_SLICE.md). These
-routes are contracted but not implemented.
+routes are implemented and covered by PostgreSQL-backed HTTP tests.
 
 ### Answer clarification
 

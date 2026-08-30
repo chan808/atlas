@@ -42,7 +42,8 @@ class PostgresInquiryStore implements InquiryStore {
 				entity.id(),
 				new BrainDump(entity.rawText()),
 				entity.status(),
-				entity.createdAt());
+				entity.createdAt(),
+				entity.version());
 	}
 
 }

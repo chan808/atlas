@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projectatlas.inquiry.application.InquiryService;
+import com.projectatlas.inquiry.application.ClarificationService;
+import com.projectatlas.inquiry.domain.ClarificationTurn;
 import com.projectatlas.inquiry.domain.Inquiry;
 
 @RestController
@@ -20,9 +22,13 @@ import com.projectatlas.inquiry.domain.Inquiry;
 public class InquiryController {
 
 	private final InquiryService inquiryService;
+	private final ClarificationService clarificationService;
 
-	public InquiryController(InquiryService inquiryService) {
+	public InquiryController(
+			InquiryService inquiryService,
+			ClarificationService clarificationService) {
 		this.inquiryService = inquiryService;
+		this.clarificationService = clarificationService;
 	}
 
 	@PostMapping
@@ -37,6 +43,32 @@ public class InquiryController {
 	@GetMapping("/{id}")
 	InquiryResponse get(@PathVariable UUID id) {
 		return InquiryResponse.from(inquiryService.get(id));
+	}
+
+	@PostMapping("/{inquiryId}/clarification-turns")
+	ResponseEntity<ClarificationTurnResponse> startClarification(
+			@PathVariable UUID inquiryId,
+			@RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,
+			@RequestBody StartClarificationRequest request) {
+		ClarificationTurn turn = clarificationService.start(
+				inquiryId,
+				request.inquiryVersion(),
+				idempotencyKey);
+		URI location = URI.create(
+				"/api/inquiries/" + inquiryId + "/clarification-turns/" + turn.id());
+		return ResponseEntity.created(location).body(ClarificationTurnResponse.from(turn));
+	}
+
+	@GetMapping("/{inquiryId}/clarification-turns/current")
+	ClarificationTurnResponse getCurrentClarificationTurn(@PathVariable UUID inquiryId) {
+		return ClarificationTurnResponse.from(clarificationService.getCurrent(inquiryId));
+	}
+
+	@GetMapping("/{inquiryId}/clarification-turns/{turnId}")
+	ClarificationTurnResponse getClarificationTurn(
+			@PathVariable UUID inquiryId,
+			@PathVariable UUID turnId) {
+		return ClarificationTurnResponse.from(clarificationService.get(inquiryId, turnId));
 	}
 
 }

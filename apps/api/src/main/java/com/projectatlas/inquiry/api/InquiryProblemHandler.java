@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.projectatlas.inquiry.application.ClarificationConflictException;
+import com.projectatlas.inquiry.application.ClarificationTurnNotFoundException;
 import com.projectatlas.inquiry.application.IdempotencyConflictException;
 import com.projectatlas.inquiry.application.InquiryNotFoundException;
 import com.projectatlas.inquiry.application.InvalidIdempotencyKeyException;
+import com.projectatlas.inquiry.application.InvalidInquiryVersionException;
+import com.projectatlas.inquiry.domain.InvalidClarificationProposalException;
 import com.projectatlas.inquiry.domain.InvalidBrainDumpException;
 
 @RestControllerAdvice(assignableTypes = InquiryController.class)
@@ -32,9 +36,19 @@ class InquiryProblemHandler {
 		return problem(
 				HttpStatus.BAD_REQUEST,
 				"Invalid inquiry request",
-				"The creation metadata does not satisfy the capture contract.",
+				"The request metadata does not satisfy the inquiry contract.",
 				"urn:project-atlas:problem:invalid-inquiry-request",
 				"Idempotency-Key");
+	}
+
+	@ExceptionHandler(InvalidInquiryVersionException.class)
+	ProblemDetail invalidInquiryVersion() {
+		return problem(
+				HttpStatus.BAD_REQUEST,
+				"Invalid clarification request",
+				"The Inquiry version does not satisfy the clarification contract.",
+				"urn:project-atlas:problem:invalid-clarification-request",
+				"inquiryVersion");
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
@@ -67,6 +81,16 @@ class InquiryProblemHandler {
 				null);
 	}
 
+	@ExceptionHandler(ClarificationTurnNotFoundException.class)
+	ProblemDetail clarificationTurnNotFound() {
+		return problem(
+				HttpStatus.NOT_FOUND,
+				"Clarification turn not found",
+				"No clarification turn exists for the requested identifiers.",
+				"urn:project-atlas:problem:clarification-turn-not-found",
+				null);
+	}
+
 	@ExceptionHandler(IdempotencyConflictException.class)
 	ProblemDetail idempotencyConflict() {
 		return problem(
@@ -75,6 +99,36 @@ class InquiryProblemHandler {
 				"The creation key has already been used for another request.",
 				"urn:project-atlas:problem:idempotency-conflict",
 				"Idempotency-Key");
+	}
+
+	@ExceptionHandler(ClarificationConflictException.class)
+	ProblemDetail clarificationConflict() {
+		return problem(
+				HttpStatus.CONFLICT,
+				"Clarification conflict",
+				"Clarification cannot start from the requested Inquiry state.",
+				"urn:project-atlas:problem:clarification-conflict",
+				null);
+	}
+
+	@ExceptionHandler(InvalidClarificationProposalException.class)
+	ProblemDetail invalidClarificationProposal() {
+		return problem(
+				HttpStatus.INTERNAL_SERVER_ERROR,
+				"Clarification unavailable",
+				"The clarification question could not be prepared.",
+				"urn:project-atlas:problem:clarification-unavailable",
+				null);
+	}
+
+	@ExceptionHandler(Exception.class)
+	ProblemDetail unexpectedFailure() {
+		return problem(
+				HttpStatus.INTERNAL_SERVER_ERROR,
+				"Inquiry operation unavailable",
+				"The inquiry operation could not be completed.",
+				"urn:project-atlas:problem:inquiry-operation-unavailable",
+				null);
 	}
 
 	private static ProblemDetail problem(

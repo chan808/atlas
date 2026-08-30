@@ -1,10 +1,14 @@
 # M1.2 First Clarification Question Contract
 
-Status: contracted; implementation not started
+Status: implemented and verified
 Product milestone: M1 curiosity to approved Learning Brief
 Depends on: completed M1.1 Brain Dump capture
-Independent review: accepted in
+Contract review: accepted in
 [`M1_FIRST_CLARIFICATION_SLICE_REVIEW.md`](M1_FIRST_CLARIFICATION_SLICE_REVIEW.md)
+Implementation evidence:
+[`M1_FIRST_CLARIFICATION_IMPLEMENTATION.md`](M1_FIRST_CLARIFICATION_IMPLEMENTATION.md)
+Independent implementation review: accepted in
+[`M1_FIRST_CLARIFICATION_IMPLEMENTATION_REVIEW.md`](M1_FIRST_CLARIFICATION_IMPLEMENTATION_REVIEW.md)
 
 ## Product-direction check
 

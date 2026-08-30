@@ -1,5 +1,6 @@
 package com.projectatlas.inquiry.domain;
 
 public enum InquiryStatus {
-	CAPTURED
+	CAPTURED,
+	CLARIFYING
 }

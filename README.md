@@ -14,11 +14,12 @@ verification; it is not part of the initial code slice yet.
 
 ## Current status
 
-This repository contains the product and architecture baseline plus the first
-implemented vertical slice: M1.1 Brain Dump capture. A local user can preserve
-an unfinished thought through the React form, retrieve it through the Spring
-Boot API, and safely retry creation without duplicate PostgreSQL state. No
-clarification or AI behavior has been implemented yet.
+This repository contains the product and architecture baseline plus M1.1 Brain
+Dump capture and M1.2 First Clarification Question. A local user can preserve
+an unfinished thought, explicitly start clarification, and see one persisted
+question with its reason beside the unchanged raw text. Creation and start are
+retry-safe in PostgreSQL. The proposal is a deterministic in-process fake; no
+live model, answer flow, Brief, or Question Map is implemented.
 
 ```text
 apps/api   Java 21 + Spring Boot modular monolith
@@ -32,9 +33,11 @@ docs       product, architecture, decisions, and AI change policy
 2. [`PRD.md`](PRD.md)
 3. [`docs/TECH_SPEC.md`](docs/TECH_SPEC.md)
 4. [`docs/M1_CAPTURE_SLICE.md`](docs/M1_CAPTURE_SLICE.md)
-5. [`docs/FIRST_VERTICAL_SLICE.md`](docs/FIRST_VERTICAL_SLICE.md)
-6. [`docs/AI_CHANGE_POLICY.md`](docs/AI_CHANGE_POLICY.md)
-7. [`AGENTS.md`](AGENTS.md)
+5. [`docs/M1_FIRST_CLARIFICATION_SLICE.md`](docs/M1_FIRST_CLARIFICATION_SLICE.md)
+6. [`docs/M1_FIRST_CLARIFICATION_IMPLEMENTATION.md`](docs/M1_FIRST_CLARIFICATION_IMPLEMENTATION.md)
+7. [`docs/FIRST_VERTICAL_SLICE.md`](docs/FIRST_VERTICAL_SLICE.md)
+8. [`docs/AI_CHANGE_POLICY.md`](docs/AI_CHANGE_POLICY.md)
+9. [`AGENTS.md`](AGENTS.md)
 
 ## Local prerequisites
 

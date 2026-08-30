@@ -31,4 +31,16 @@ interface InquiryJpaRepository extends JpaRepository<InquiryJpaEntity, UUID> {
 
 	Optional<InquiryJpaEntity> findByCreationIdempotencyKey(String creationIdempotencyKey);
 
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query(value = """
+			UPDATE inquiries
+			SET status = 'CLARIFYING', version = version + 1
+			WHERE id = :id
+			  AND status = 'CAPTURED'
+			  AND version = :expectedVersion
+			""", nativeQuery = true)
+	int transitionToClarifying(
+			@Param("id") UUID id,
+			@Param("expectedVersion") long expectedVersion);
+
 }

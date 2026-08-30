@@ -289,6 +289,81 @@
   word-break: keep-all;
 }
 
+.clarification-start,
+.clarification-result {
+  margin-top: 30px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.clarification-start h3,
+.clarification-result h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+.clarification-start > p {
+  margin: 14px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.clarification-label {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.clarification-reason {
+  margin-top: 24px;
+  padding: 18px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  background: rgba(232, 235, 226, 0.72);
+}
+
+.clarification-reason h4 {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.clarification-reason p,
+.slice-boundary {
+  color: var(--muted);
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.clarification-reason p {
+  margin: 9px 0 0;
+}
+
+.slice-boundary {
+  margin: 20px 0 0;
+  font-size: 13px;
+}
+
+.clarification-start .clarification-error {
+  margin-top: 18px;
+  color: #a33a32;
+}
+
+.clarification-button {
+  margin-top: 20px;
+}
+
 .principles {
   display: flex;
   flex-wrap: wrap;

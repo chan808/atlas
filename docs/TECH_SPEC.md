@@ -2,8 +2,9 @@
 
 Status: architecture baseline v0.1
 Completed implementation milestone: M0 repository setup
-Implemented engineering slice: M1.1 Brain Dump capture
-Next engineering slice: M1.2 First Clarification Question contracted, not implemented
+Implemented engineering slices: M1.1 Brain Dump capture and M1.2 First
+Clarification Question
+Next engineering slice: first clarification answer, not yet contracted
 
 ## 1. Design objective
 
@@ -43,10 +44,10 @@ Browser
   -> PostgreSQL
 ```
 
-The current code contains only the `inquiry` product module needed to capture
-and retrieve a Brain Dump. M1.2 contracts the first clarification proposal
-port, deterministic fake, persisted turn, and `CAPTURED -> CLARIFYING`
-transition, but none is implemented yet. There is no Worker, Runner, message
+The current code contains only the `inquiry` product module needed to capture a
+Brain Dump and explicitly start and retrieve one first clarification turn.
+M1.2 implements a product proposal port, deterministic fake, persisted turn,
+and `CAPTURED -> CLARIFYING` transition. There is no Worker, Runner, message
 broker, cache, vector store, or activity framework.
 
 ### Target product concepts, not initial modules
@@ -132,14 +133,12 @@ Module rules:
 
 ## 6. M1 domain model
 
-M1.1 implements only an `Inquiry` with an immutable raw value, `CAPTURED`
-status, creation time, and creation idempotency key. The remaining types in this
-section are M1 design constraints, not permission to scaffold them early. The
-executable M1.1 contract is `docs/M1_CAPTURE_SLICE.md`.
-
-The next executable contract is
-`docs/M1_FIRST_CLARIFICATION_SLICE.md`. Until its implementation is complete,
-the code and deployed behavior remain M1.1 only.
+M1.1 implements an `Inquiry` with an immutable raw value, `CAPTURED` status,
+creation time, and creation idempotency key. M1.2 adds only optimistic version,
+`CLARIFYING`, and the first persisted clarification turn. The remaining types
+in this section are M1 design constraints, not permission to scaffold them
+early. The executable contracts are `docs/M1_CAPTURE_SLICE.md` and
+`docs/M1_FIRST_CLARIFICATION_SLICE.md`.
 
 ### Inquiry
 
@@ -156,19 +155,17 @@ Fields needed by the complete M1 design may eventually include:
 - optimistic-lock `version`
 - current proposed and approved Brief revision references
 
-M1.1 does not add `updatedAt`, optimistic `version`, or Brief references because
-it has no update operation. `rawText` is immutable after creation. A materially
-different thought creates a new Inquiry; it does not overwrite history.
+M1.1 did not need an update version. M1.2 adds optimistic `version` for the
+clarification transition but still does not add `updatedAt` or Brief
+references. `rawText` is immutable after creation. A materially different
+thought creates a new Inquiry; it does not overwrite history.
 
 ### ClarificationTurn
 
-- stable turn identifier
-- inquiry identifier
-- sequence number
-- proposed question
-- reason the question can change the direction
-- answer kind and optional free text
-- created and answered times
+M1.2 implements a stable turn identifier, Inquiry identifier, sequence `1`,
+proposed question, reason, proposal source/schema metadata, creation time, and
+resulting Inquiry version. Answer kind, optional text, answered time, and later
+sequences remain future M1 design fields.
 
 The M1 flow asks at most three initial turns. Allowed answers include
 `FREE_TEXT`, `DO_NOT_KNOW`, `BOTH`, and `SHOW_EXAMPLE`.
@@ -311,7 +308,7 @@ in the application and are not treated as authorization.
   wildcard CORS policy for convenience.
 
 The implemented capture API contract is in `docs/M1_CAPTURE_SLICE.md`; the
-contracted first-question API is in
+implemented first-question API is in
 `docs/M1_FIRST_CLARIFICATION_SLICE.md`. The wider M1 product contract remains in
 `docs/FIRST_VERTICAL_SLICE.md` and may change before each later slice is
 implemented. An OpenAPI generator is added only when another client or contract
@@ -352,8 +349,11 @@ never mount a Docker socket or run user-provided commands.
 
 - M1.1 component tests for blank and oversized input, exact request values,
   retry-key reuse, duplicate-submit prevention, and preserving input on failure
-- Later M1 component tests for one-question display, alternative answers, Brief
-  editing, and approval when those behaviors are implemented
+- M1.2 component tests for explicit start, one-question display, retry-key
+  reuse, conflict recovery, terminal errors, and distinct raw/question/reason
+  presentation
+- Later M1 component tests for alternative answers, Brief editing, and approval
+  when those behaviors are implemented
 - A small number of automated end-to-end tests when the first multi-step M1
   path makes the browser/API boundary regression-prone
 - Accessibility assertions on the primary flow
