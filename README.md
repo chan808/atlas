@@ -56,6 +56,28 @@ docker compose up -d --wait postgres
 pnpm install
 ```
 
+## One-click Windows start
+
+After installing dependencies once, start Docker Desktop manually and wait
+until its engine is ready. Then double-click `dev.cmd` in the repository root.
+It starts PostgreSQL, opens visible API and web terminals, waits for both
+applications, and opens `http://127.0.0.1:5173` in the default browser.
+
+The same launcher can be controlled from PowerShell:
+
+```powershell
+.\dev.ps1          # same as start
+.\dev.ps1 start    # PostgreSQL + API + web + browser
+.\dev.ps1 infra    # PostgreSQL only
+.\dev.ps1 status   # inspect without starting anything
+.\dev.ps1 stop     # stop launcher-owned apps and PostgreSQL; keep DB data
+```
+
+Use `./dev.ps1 start -NoBrowser` when a browser should not open. Repeating
+`start` reuses healthy services instead of creating duplicates. `stop` never
+deletes the PostgreSQL volume and never kills an API or web process that the
+launcher did not start.
+
 The checked-in defaults work without a `.env` file. To override Compose values,
 copy the example to the special filename that Compose reads automatically:
 
@@ -63,8 +85,10 @@ copy the example to the special filename that Compose reads automatically:
 Copy-Item .env.example .env
 ```
 
-The API runs as a host process, so any API overrides must also be exported into
-that terminal environment.
+The launcher asks Docker Compose to resolve `.env` and shell precedence, then
+copies only allowlisted Atlas values into the API child process. When using the
+direct commands below, API overrides must instead be exported into that
+terminal environment.
 
 Run the API:
 

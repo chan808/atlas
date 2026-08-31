@@ -175,6 +175,13 @@ pnpm install --frozen-lockfile
 
 개발 서버 실행 명령은 `README.md`에 있다.
 
+Windows에서는 의존성을 한 번 설치하고 Docker Desktop을 직접 켠 뒤, 저장소
+루트의 `dev.cmd`를 더블클릭하면 PostgreSQL, API, 웹이 각각 시작되고 준비가
+끝난 뒤 브라우저가 열린다. PowerShell에서는 `./dev.ps1`이 같은 동작이며
+`infra`, `status`, `stop`도 지원한다. `stop`은 DB 볼륨을 삭제하지 않고,
+실행기가 직접 시작했다고 검증한 API·웹 프로세스만 종료한다. 세부 계약과
+실패·롤백 기준은 `docs/LOCAL_DEV_LAUNCHER.md`에 있다.
+
 ## M1.1과 M1.2 검증 결과와 다음 결정
 
 M1.1은 API, DB 마이그레이션, 웹 입력 보존과 실패·재시도 테스트를 함께

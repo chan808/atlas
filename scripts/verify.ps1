@@ -4,6 +4,8 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 
 Push-Location $repoRoot
 try {
+    & .\scripts\verify-dev-launcher.ps1
+
     pnpm --dir apps/web verify
     if ($LASTEXITCODE -ne 0) {
         throw "Web verification failed with exit code $LASTEXITCODE"
